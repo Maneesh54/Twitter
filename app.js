@@ -172,34 +172,25 @@ app.post("/user/tweets/",authenticateToken , async (request, response) => {
   response.send("Created a Tweet");
 });
 
-app.delete(
-  "/tweets/:tweetId/",
-  authenticateToken,
-  async (request, response) => {
-    const { tweetId } = request.params;
-    const { username } = request;
-    const getTweetsOfUser = `
-    select 
-    tweet.tweet_id 
-    from user natural join tweet 
-    where user.username='${username}';
+app.get("/user/tweets/feed/", authenticateToken, async (request, response) => {
+  const { username } = request;
+  const getTweetsOfUserFollowing = `
+    SELECT
+    u2.username AS username,
+    tweet.tweet AS tweet,
+    tweet.date_time AS dateTime
+    FROM 
+    (user AS u1 JOIN follower ON u1.user_id=follower.follower_user_id)
+    JOIN user AS u2 ON u2.user_id=follower.following_user_id 
+    JOIN tweet ON follower.following_user_id=tweet.user_id
+    WHERE u1.username='${username}'
+    ORDER BY dateTime DESC
+    LIMIT 4
     `;
-    const tweetsOfUser = await db.all(getTweetsOfUser);
-    const isTrue = tweetsOfUser.some(
-      (tweet) => tweet.tweet_id === parseInt(tweetId)
-    );
-    if (isTrue === false) {
-      response.status(401);
-      response.send("Invalid Request");
-    } else {
-      const deleteTweetQuery = `
-        delete from tweet
-        where tweet_id=${tweetId};
-        `;
-      await db.run(deleteTweetQuery);
-      response.send("Tweet Removed");
-    }
-  }
-);
+  const tweetsOfUserFollowing = await db.all(getTweetsOfUserFollowing);
+  response.send(tweetsOfUserFollowing);
+});
+
+
 
 module.exports = app;
