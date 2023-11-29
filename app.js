@@ -131,12 +131,9 @@ app.get("/user/tweets/",authenticateToken, async (request, response) => {
   const getTweetsQuery = `
     select
     tweet.tweet,
-    count(like.like_id) as likes,
-    count(reply.reply_id) as replies,
-    tweet.date_time as dateTime
+    count(like.like_id) as likes
     from
     user join tweet on user.user_id=tweet.user_id
-    left join reply on reply.tweet_id=tweet.tweet_id
     left join like on like.tweet_id=tweet.tweet_id
     where user.username='${username}'
     group by tweet.tweet_id

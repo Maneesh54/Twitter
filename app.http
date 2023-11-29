@@ -1,0 +1,19 @@
+###
+post http://localhost:3000/login/
+Content-Type: application/json
+
+{
+    "username" : "JoeBiden",
+    "password" : "biden@123"
+}
+
+###
+
+get http://localhost:3000/user/tweets/
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNzAxMjMyNjAxfQ.xM1EaAmvuAGbHCO-4HxSDEcv69LvKFPG7caLeCJjJic
+
+Content-Type: application/json
+
+{
+    "username" : "JoeBiden"
+}
