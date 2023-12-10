@@ -126,22 +126,6 @@ app.get("/user/followers", authenticateToken , async (request, response) => {
   response.send(followers);
 });
 
-app.get("/user/tweets/",authenticateToken, async (request, response) => {
-  const { username } = request;
-  const getTweetsQuery = `
-    select
-    tweet.tweet,
-    count(like.like_id) as likes
-    from
-    user join tweet on user.user_id=tweet.user_id
-    left join like on like.tweet_id=tweet.tweet_id
-    where user.username='${username}'
-    group by tweet.tweet_id
-    `;
-  const tweets = await db.all(getTweetsQuery);
-  response.send(tweets);
-});
-
 app.post("/user/tweets/",authenticateToken , async (request, response) => {
   const { username } = request;
   const getUserId = `
@@ -168,6 +152,23 @@ app.post("/user/tweets/",authenticateToken , async (request, response) => {
   const result = await db.run(postTweetQuery);
   response.send("Created a Tweet");
 });
+
+app.get("/user/tweets/",authenticateToken, async (request, response) => {
+  const { username } = request;
+  const getTweetsQuery = `
+    select
+    tweet.tweet,
+    count(like.like_id) as likes
+    from
+    user join tweet on user.user_id=tweet.user_id
+    left join like on like.tweet_id=tweet.tweet_id
+    where user.username='${username}'
+    group by tweet.tweet_id
+    `;
+  const tweets = await db.all(getTweetsQuery);
+  response.send(tweets);
+});
+
 
 app.get("/user/tweets/feed/", authenticateToken, async (request, response) => {
   const { username } = request;
